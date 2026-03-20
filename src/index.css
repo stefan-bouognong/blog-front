@@ -1,0 +1,213 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Premium Blog Design System - Light, Airy, Warm */
+
+@layer base {
+  :root {
+    /* Warm, inviting palette */
+    --background: 40 33% 98%;
+    --foreground: 20 14% 12%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 20 14% 12%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 20 14% 12%;
+
+    /* Warm coral accent */
+    --primary: 15 80% 55%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Soft cream secondary */
+    --secondary: 35 30% 95%;
+    --secondary-foreground: 20 14% 12%;
+
+    --muted: 40 20% 94%;
+    --muted-foreground: 20 10% 45%;
+
+    --accent: 35 30% 92%;
+    --accent-foreground: 20 14% 12%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 30 20% 90%;
+    --input: 30 20% 90%;
+    --ring: 15 80% 55%;
+
+    --radius: 0.75rem;
+
+    /* Custom blog tokens */
+    --blog-title: 20 14% 8%;
+    --blog-excerpt: 20 10% 40%;
+    --blog-meta: 20 8% 55%;
+    --blog-surface: 40 40% 99%;
+    --blog-hover: 35 35% 97%;
+    --blog-shadow: 30 30% 85%;
+    --blog-accent-light: 15 85% 95%;
+    
+    /* Gradient tokens */
+    --gradient-warm: linear-gradient(135deg, hsl(15 80% 55%), hsl(25 75% 60%));
+    --gradient-soft: linear-gradient(180deg, hsl(40 33% 98%), hsl(35 30% 95%));
+
+    --sidebar-background: 40 33% 98%;
+    --sidebar-foreground: 20 14% 12%;
+    --sidebar-primary: 15 80% 55%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 35 30% 92%;
+    --sidebar-accent-foreground: 20 14% 12%;
+    --sidebar-border: 30 20% 90%;
+    --sidebar-ring: 15 80% 55%;
+  }
+
+  .dark {
+    --background: 20 14% 8%;
+    --foreground: 40 20% 95%;
+
+    --card: 20 14% 10%;
+    --card-foreground: 40 20% 95%;
+
+    --popover: 20 14% 10%;
+    --popover-foreground: 40 20% 95%;
+
+    --primary: 15 75% 60%;
+    --primary-foreground: 20 14% 8%;
+
+    --secondary: 20 12% 15%;
+    --secondary-foreground: 40 20% 95%;
+
+    --muted: 20 12% 18%;
+    --muted-foreground: 30 15% 60%;
+
+    --accent: 20 12% 18%;
+    --accent-foreground: 40 20% 95%;
+
+    --destructive: 0 62% 45%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 20 12% 18%;
+    --input: 20 12% 18%;
+    --ring: 15 75% 60%;
+
+    --blog-title: 40 20% 95%;
+    --blog-excerpt: 30 15% 70%;
+    --blog-meta: 30 10% 55%;
+    --blog-surface: 20 14% 10%;
+    --blog-hover: 20 12% 12%;
+    --blog-shadow: 20 14% 5%;
+    --blog-accent-light: 15 30% 15%;
+
+    --sidebar-background: 20 14% 10%;
+    --sidebar-foreground: 40 20% 95%;
+    --sidebar-primary: 15 75% 60%;
+    --sidebar-primary-foreground: 20 14% 8%;
+    --sidebar-accent: 20 12% 15%;
+    --sidebar-accent-foreground: 40 20% 95%;
+    --sidebar-border: 20 12% 18%;
+    --sidebar-ring: 15 75% 60%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Poppins', sans-serif;
+    @apply font-semibold tracking-tight;
+  }
+}
+
+@layer components {
+  .blog-card {
+    @apply bg-card rounded-xl overflow-hidden transition-all duration-300 ease-out;
+    box-shadow: 0 4px 20px -4px hsl(var(--blog-shadow) / 0.15);
+  }
+
+  .blog-card:hover {
+    @apply -translate-y-1;
+    box-shadow: 0 12px 40px -8px hsl(var(--blog-shadow) / 0.25);
+  }
+
+  .blog-title {
+    @apply text-[hsl(var(--blog-title))] font-semibold leading-tight;
+  }
+
+  .blog-excerpt {
+    @apply text-[hsl(var(--blog-excerpt))] leading-relaxed;
+  }
+
+  .blog-meta {
+    @apply text-[hsl(var(--blog-meta))] text-sm;
+  }
+
+  .blog-content {
+    @apply prose prose-lg max-w-none;
+    @apply prose-headings:text-[hsl(var(--blog-title))] prose-headings:font-semibold;
+    @apply prose-p:text-[hsl(var(--foreground))] prose-p:leading-relaxed;
+    @apply prose-a:text-primary prose-a:no-underline hover:prose-a:underline;
+    @apply prose-strong:text-[hsl(var(--blog-title))];
+    @apply prose-ul:text-[hsl(var(--foreground))] prose-ol:text-[hsl(var(--foreground))];
+  }
+
+  .btn-primary {
+    @apply bg-primary text-primary-foreground hover:opacity-90 transition-all duration-200;
+  }
+
+  .btn-ghost {
+    @apply hover:bg-accent transition-colors duration-200;
+  }
+
+  .input-field {
+    @apply bg-background border border-border rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200;
+  }
+
+  .nav-link {
+    @apply text-[hsl(var(--blog-meta))] hover:text-[hsl(var(--foreground))] transition-colors duration-200 font-medium;
+  }
+
+  .nav-link-active {
+    @apply text-primary;
+  }
+
+  .category-badge {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-[hsl(var(--blog-accent-light))] text-primary;
+  }
+
+  .page-transition {
+    animation: fadeIn 0.4s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .hover-lift {
+    @apply transition-transform duration-300 hover:-translate-y-0.5;
+  }
+
+  .image-zoom {
+    @apply transition-transform duration-500 hover:scale-105;
+  }
+}
