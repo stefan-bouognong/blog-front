@@ -30,7 +30,7 @@ export function Footer() {
             to="/admin"
             className="text-xs text-muted-foreground hover:text-foreground transition-colors md:order-2"
           >
-           Administration ici 
+           {/* Administration ici  */}
           </Link>
 
           {/* Social Icons */}
