@@ -14,7 +14,7 @@ export default function AdminLogin({ onLoginSuccess }: Props) {
     setError("");
 
     try {
-      const res = await fetch("https://blog-back-two.vercel.app/api-token-auth/", {
+      const res = await fetch("https://blog-back-bgvo.onrender.com/api-token-auth/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),

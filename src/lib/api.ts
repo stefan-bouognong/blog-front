@@ -1,7 +1,7 @@
 // src/lib/api.ts
 import type { Article, Commentaire, CreateArticleData, UpdateArticleData, CreateCommentaireData, Category } from '@/types/blog';
 
-const BASE_URL = 'https://blog-back-two.vercel.app/api';
+const BASE_URL = 'https://blog-back-bgvo.onrender.com/api';
 
 interface ApiError {
   detail?: string;
