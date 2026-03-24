@@ -187,7 +187,7 @@ const Admin = () => {
     }
   };
 
-  // ── Upload Cloudinary (inchangé) ───────────────────────────────────────────
+  // ── Upload Cloudinary (inchangé) ───────────────────────────────────────────-
   const uploadToCloudinary = async (file: File): Promise<string> => {
     const CLOUDINARY_URL = import.meta.env.VITE_CLOUDINARY_URL;
     const UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
