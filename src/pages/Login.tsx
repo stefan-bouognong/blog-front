@@ -15,7 +15,7 @@ const Login = () => {
 
     try {
       // Appel à l'API Django pour récupérer le token
-      const res = await fetch('https://blog-back-bgvo.onrender.com/api-token-auth/', {
+      const res = await fetch('https://blog-back-two.vercel.app/api-token-auth/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
