@@ -189,8 +189,8 @@ const Admin = () => {
 
   // ── Upload Cloudinary (inchangé) ───────────────────────────────────────────-
   const uploadToCloudinary = async (file: File): Promise<string> => {
-    const CLOUDINARY_URL = import.meta.env.VITE_CLOUDINARY_URL;
-    const UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
+    const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/dqmsvnt0e";
+    const UPLOAD_PRESET = "vehicle_upload";
 
     if (!CLOUDINARY_URL || !UPLOAD_PRESET) {
       throw new Error('Configuration Cloudinary incomplète');
@@ -199,10 +199,7 @@ const Admin = () => {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('upload_preset', UPLOAD_PRESET);
-
-    const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME ||
-      CLOUDINARY_URL.match(/res\.cloudinary\.com\/([^/]+)/)?.[1] ||
-      CLOUDINARY_URL;
+    const cloudName = "dqmsvnt0e";
 
     if (cloudName) formData.append('cloud_name', cloudName);
 

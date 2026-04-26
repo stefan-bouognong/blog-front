@@ -1,9 +1,9 @@
 // Configuration Cloudinary pour l'upload d'images
 // Support pour VITE_CLOUDINARY_CLOUD_NAME (standard) ou VITE_CLOUDINARY_URL (si URL complète fournie)
 
-const CLOUDINARY_CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || '';
-const CLOUDINARY_UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || '';
-const CLOUDINARY_URL = import.meta.env.VITE_CLOUDINARY_URL || '';
+const CLOUDINARY_CLOUD_NAME = "dqmsvnt0e";
+const CLOUDINARY_UPLOAD_PRESET = "vehicle_upload";
+const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/dqmsvnt0e";
 
 // Si VITE_CLOUDINARY_URL est fourni, extraire le cloud_name de l'URL
 const getCloudName = (): string => {
