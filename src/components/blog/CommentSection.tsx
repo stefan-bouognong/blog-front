@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { format } from 'date-fns';
-import { MessageCircle, User, Send, AlertTriangle } from 'lucide-react';
+import { MessageCircle, User, Send, AlertTriangle, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -21,6 +21,7 @@ export function CommentSection({ articleId }: CommentSectionProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<number | null>(null);
 
   // Charger les commentaires
   useEffect(() => {
@@ -36,21 +37,23 @@ export function CommentSection({ articleId }: CommentSectionProps) {
         setLoading(false);
       }
     };
+
     loadComments();
   }, [articleId]);
 
-  // Détection simple de lien (http, https, www.)
+  // Détection simple de lien
   const containsLink = (text: string): boolean => {
     const linkRegex = /(https?:\/\/|www\.)[^\s<>{}()[\]]+/gi;
     return linkRegex.test(text);
   };
 
+  // Ajout commentaire
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     const trimmedMessage = message.trim();
     if (!trimmedMessage) return;
 
-    // Blocage frontend des liens
     if (containsLink(trimmedMessage)) {
       setError('Les liens ne sont pas autorisés dans les commentaires.');
       return;
@@ -66,13 +69,31 @@ export function CommentSection({ articleId }: CommentSectionProps) {
         article: articleId,
       });
 
-      setComments(prev => [newComment, ...prev.filter(c => c.id !== newComment.id)]);
+      setComments(prev => [newComment, ...prev]);
       setName('');
       setMessage('');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erreur lors de l\'envoi');
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  // ❌ Suppression commentaire
+  const handleDeleteComment = async (commentId: number) => {
+    const confirmDelete = window.confirm('Voulez-vous vraiment supprimer ce commentaire ?');
+    if (!confirmDelete) return;
+
+    try {
+      setDeletingId(commentId);
+
+      await api.deleteComment(commentId); // 👈 API suppression par ID
+
+      setComments(prev => prev.filter(c => c.id !== commentId));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erreur suppression commentaire');
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -83,7 +104,7 @@ export function CommentSection({ articleId }: CommentSectionProps) {
         Commentaires ({comments.length})
       </h2>
 
-      {/* Formulaire */}
+      {/* FORMULAIRE */}
       <form onSubmit={handleSubmit} className="mb-10 space-y-5">
         {error && (
           <Alert variant="destructive">
@@ -114,9 +135,6 @@ export function CommentSection({ articleId }: CommentSectionProps) {
             required
             className="min-h-[120px] resize-y"
           />
-          <p className="text-xs text-muted-foreground">
-            Les liens et adresses web sont interdits pour éviter le spam.
-          </p>
         </div>
 
         <Button type="submit" disabled={isSubmitting || !message.trim()} className="gap-2">
@@ -125,7 +143,7 @@ export function CommentSection({ articleId }: CommentSectionProps) {
         </Button>
       </form>
 
-      {/* Liste des commentaires */}
+      {/* LISTE COMMENTAIRES */}
       {loading ? (
         <div className="text-center py-12 text-muted-foreground">
           Chargement des commentaires...
@@ -148,14 +166,29 @@ export function CommentSection({ articleId }: CommentSectionProps) {
                 <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
                   <User className="h-5 w-5 text-primary" />
                 </div>
+
                 <div className="flex-1">
-                  <div className="flex items-baseline gap-3 mb-1">
-                    <span className="font-medium">{comment.nom || 'Anonymous'}</span>
-                    <span className="text-xs text-muted-foreground">
-                      {format(new Date(comment.created_at), 'dd MMM yyyy · HH:mm')}
-                    </span>
+                  {/* header */}
+                  <div className="flex items-center justify-between mb-1">
+                    <div className="flex items-baseline gap-3">
+                      <span className="font-medium">{comment.nom || 'Anonymous'}</span>
+                      <span className="text-xs text-muted-foreground">
+                        {format(new Date(comment.created_at), 'dd MMM yyyy · HH:mm')}
+                      </span>
+                    </div>
+
+                    {/* delete */}
+                    <button
+                      onClick={() => handleDeleteComment(comment.id)}
+                      disabled={deletingId === comment.id}
+                      className="text-red-500 hover:text-red-700 transition"
+                      title="Supprimer"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
                   </div>
-                  {/* Affichage sécurisé : texte brut uniquement */}
+
+                  {/* message */}
                   <p className="text-foreground/90 leading-relaxed whitespace-pre-wrap break-words">
                     {comment.message}
                   </p>
