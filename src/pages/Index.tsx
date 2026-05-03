@@ -7,17 +7,17 @@ import { useBlog } from '@/context/BlogContext';
 import { cn } from '@/lib/utils';
 
 const Index = () => {
-  const { articles, categories } = useBlog();
+  const { articles, categories, ready } = useBlog();
   const [selectedCategory, setSelectedCategory] = useState<number | 'all'>('all');
 
   const filteredArticles = useMemo(() => {
     const sorted = [...articles].sort(
       (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
     );
-  
+
     if (selectedCategory === 'all') return sorted;
-  
-    return sorted.filter(article => 
+
+    return sorted.filter(article =>
       article.categorie_detail?.id === selectedCategory
     );
   }, [articles, selectedCategory]);
@@ -45,12 +45,11 @@ const Index = () => {
 
         <div className="container mx-auto px-6 relative z-10">
           <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-16">
-          <img
-          src={founderImage}
-          alt="Eliade Kibangoud Mboungou"
-          className="w-48 h-48 md:w-60 md:h-60 rounded-full object-cover shadow-xl ring-4 ring-primary/20"
-        />
-
+            <img
+              src={founderImage}
+              alt="Eliade Kibangoud Mboungou"
+              className="w-48 h-48 md:w-60 md:h-60 rounded-full object-cover shadow-xl ring-4 ring-primary/20"
+            />
 
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -69,7 +68,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Filtres catégories dynamiques */}
+      {/* Filtres catégories */}
       <section className="py-8 border-b border-border">
         <div className="container mx-auto px-6">
           <div className="flex flex-wrap justify-center gap-3">
@@ -77,7 +76,9 @@ const Index = () => {
               onClick={() => setSelectedCategory('all')}
               className={cn(
                 'px-4 py-2 rounded-full text-sm font-medium transition-colors',
-                selectedCategory === 'all' ? 'bg-primary text-white' : 'bg-secondary text-muted-foreground hover:bg-secondary/80'
+                selectedCategory === 'all'
+                  ? 'bg-primary text-white'
+                  : 'bg-secondary text-muted-foreground hover:bg-secondary/80'
               )}
             >
               Tous
@@ -89,7 +90,9 @@ const Index = () => {
                 onClick={() => setSelectedCategory(cat.id)}
                 className={cn(
                   'px-4 py-2 rounded-full text-sm font-medium transition-colors',
-                  selectedCategory === cat.id ? 'bg-primary text-white' : 'bg-secondary text-muted-foreground hover:bg-secondary/80'
+                  selectedCategory === cat.id
+                    ? 'bg-primary text-white'
+                    : 'bg-secondary text-muted-foreground hover:bg-secondary/80'
                 )}
               >
                 {cat.label}
@@ -99,18 +102,32 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Grille articles */}
+      {/* Articles */}
       <section className="py-12 md:py-16">
         <div className="container mx-auto px-6">
-          {filteredArticles.length === 0 ? (
-            <p className="text-center text-muted-foreground py-12">Aucun article dans cette catégorie</p>
+
+          {/* 🔄 LOADING — tourne indéfiniment jusqu'à ce que ready soit true */}
+          {!ready ? (
+            <div className="flex flex-col justify-center items-center py-20 gap-4">
+              <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+              <p className="text-muted-foreground text-sm">
+                Chargement des articles...
+              </p>
+            </div>
+          ) : filteredArticles.length === 0 ? (
+            /* 📭 VIDE */
+            <p className="text-center text-muted-foreground py-12">
+              Aucun article dans cette catégorie
+            </p>
           ) : (
+            /* ✅ ARTICLES */
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {filteredArticles.map((article, i) => (
                 <BlogCard key={article.id} article={article} index={i} />
               ))}
             </div>
           )}
+
         </div>
       </section>
     </Layout>

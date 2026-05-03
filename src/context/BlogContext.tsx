@@ -6,10 +6,11 @@ interface BlogContextType {
   articles: Article[];
   categories: Category[];
   loading: boolean;
+  ready: boolean;
   error: string | null;
   token: string | null;
   setToken: (token: string | null) => void;
-  
+
   // Articles
   addArticle: (data: CreateArticleData) => Promise<void>;
   updateArticle: (id: number, data: UpdateArticleData) => Promise<void>;
@@ -27,26 +28,46 @@ interface BlogContextType {
 
 const BlogContext = createContext<BlogContextType | undefined>(undefined);
 
-export function BlogProvider({ children, token: initialToken }: { children: ReactNode; token?: string }) {
+export function BlogProvider({
+  children,
+  token: initialToken
+}: {
+  children: ReactNode;
+  token?: string;
+}) {
   const [articles, setArticles] = useState<Article[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
+  const [ready, setReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [token, setToken] = useState<string | null>(initialToken || null);
 
-  // Chargement initial des données
+  // ─────────────────────────────
+  // Chargement initial
+  // ─────────────────────────────
   const loadData = async () => {
     try {
       setLoading(true);
+      setReady(false);
+
       const [arts, cats] = await Promise.all([
         api.getArticles(),
         api.getCategories(),
       ]);
+
       setArticles(arts);
       setCategories(cats);
       setError(null);
+
+      // ✅ ready passe à true uniquement si les données arrivent
+      setReady(true);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erreur lors du chargement des données');
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'Erreur lors du chargement des données'
+      );
+      // ⚠️ ready reste false → le spinner continue de tourner
     } finally {
       setLoading(false);
     }
@@ -56,8 +77,9 @@ export function BlogProvider({ children, token: initialToken }: { children: Reac
     loadData();
   }, []);
 
-  // ── Articles ────────────────────────────────────────────────────────────────
-
+  // ─────────────────────────────
+  // ARTICLES
+  // ─────────────────────────────
   const addArticle = async (data: CreateArticleData) => {
     if (!token) throw new Error('Non authentifié');
     const newArticle = await api.createArticle(data, token);
@@ -90,30 +112,41 @@ export function BlogProvider({ children, token: initialToken }: { children: Reac
   const getLatestArticles = (count: number, excludeId?: number) => {
     let filtered = articles;
     if (excludeId) filtered = filtered.filter(a => a.id !== excludeId);
+
     return filtered
-      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+      .sort(
+        (a, b) =>
+          new Date(b.created_at).getTime() -
+          new Date(a.created_at).getTime()
+      )
       .slice(0, count);
   };
 
-  // ── Catégories ──────────────────────────────────────────────────────────────
-
+  // ─────────────────────────────
+  // CATEGORIES
+  // ─────────────────────────────
   const addCategory = async (data: { nom: string; label: string }) => {
     if (!token) throw new Error('Non authentifié');
     const newCat = await api.createCategory(data, token);
     setCategories(prev => [...prev, newCat]);
   };
 
-  const updateCategory = async (id: number, data: { nom: string; label: string }) => {
+  const updateCategory = async (
+    id: number,
+    data: { nom: string; label: string }
+  ) => {
     if (!token) throw new Error('Non authentifié');
     const updated = await api.updateCategory(id, data, token);
-    setCategories(prev => prev.map(c => (c.id === id ? updated : c)));
+    setCategories(prev =>
+      prev.map(c => (c.id === id ? updated : c))
+    );
   };
 
   const deleteCategory = async (id: number) => {
     if (!token) throw new Error('Non authentifié');
     await api.deleteCategory(id, token);
     setCategories(prev => prev.filter(c => c.id !== id));
-    // Cascade : recharger les articles car ils ont pu être supprimés
+
     await refreshArticles();
   };
 
@@ -132,6 +165,7 @@ export function BlogProvider({ children, token: initialToken }: { children: Reac
         articles,
         categories,
         loading,
+        ready,
         error,
         token,
         setToken,
@@ -154,10 +188,11 @@ export function BlogProvider({ children, token: initialToken }: { children: Reac
   );
 }
 
+// Hook sécurisé
 export function useBlog() {
   const context = useContext(BlogContext);
   if (!context) {
-    throw new Error('useBlog doit être utilisé à l’intérieur de BlogProvider');
+    throw new Error('useBlog doit être utilisé à l\'intérieur de BlogProvider');
   }
   return context;
 }

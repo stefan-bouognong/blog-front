@@ -8,6 +8,6 @@ interface Props {
 
 export const ProtectedRoute = ({ children }: Props) => {
   const { token } = useBlog();
-  if (!token) return <Navigate to="/login" replace />;
+  if (!token) return <Navigate to="/login246" replace />;
   return children;
 };
