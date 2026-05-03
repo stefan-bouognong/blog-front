@@ -1,5 +1,11 @@
-// src/lib/api.ts
-import type { Article, Commentaire, CreateArticleData, UpdateArticleData, CreateCommentaireData, Category } from '@/types/blog';
+import type {
+  Article,
+  Commentaire,
+  CreateArticleData,
+  UpdateArticleData,
+  CreateCommentaireData,
+  Category,
+} from '@/types/blog';
 
 const BASE_URL = 'https://blog-back-bgvo.onrender.com/api';
 
@@ -9,13 +15,17 @@ interface ApiError {
   [key: string]: any;
 }
 
+// ==================== HELPERS ====================
+
 async function handleResponse<T>(res: Response): Promise<T> {
   if (!res.ok) {
     const error: ApiError = await res.json().catch(() => ({
       detail: `HTTP error! status: ${res.status}`,
     }));
+
     throw new Error(error.detail || error.message || 'Une erreur est survenue');
   }
+
   return res.json();
 }
 
@@ -31,7 +41,10 @@ export async function getArticle(id: number): Promise<Article> {
   return handleResponse<Article>(res);
 }
 
-export async function createArticle(data: CreateArticleData, token: string | null): Promise<Article> {
+export async function createArticle(
+  data: CreateArticleData,
+  token: string | null
+): Promise<Article> {
   const res = await fetch(`${BASE_URL}/articles/`, {
     method: 'POST',
     headers: {
@@ -40,10 +53,15 @@ export async function createArticle(data: CreateArticleData, token: string | nul
     },
     body: JSON.stringify(data),
   });
+
   return handleResponse<Article>(res);
 }
 
-export async function updateArticle(id: number, data: UpdateArticleData, token: string | null): Promise<Article> {
+export async function updateArticle(
+  id: number,
+  data: UpdateArticleData,
+  token: string | null
+): Promise<Article> {
   const res = await fetch(`${BASE_URL}/articles/${id}/`, {
     method: 'PUT',
     headers: {
@@ -52,6 +70,7 @@ export async function updateArticle(id: number, data: UpdateArticleData, token: 
     },
     body: JSON.stringify(data),
   });
+
   return handleResponse<Article>(res);
 }
 
@@ -64,14 +83,13 @@ export async function deleteArticle(id: number, token: string | null): Promise<v
   });
 
   if (!res.ok) {
-    const error: ApiError = await res.json().catch(() => ({
+    const error = await res.json().catch(() => ({
       detail: `HTTP error! status: ${res.status}`,
     }));
-    throw new Error(error.detail || error.message || 'Erreur lors de la suppression');
+
+    throw new Error(error.detail || 'Erreur lors de la suppression');
   }
 }
-
-
 
 // ==================== CATÉGORIES ====================
 
@@ -80,27 +98,36 @@ export async function getCategories(): Promise<Category[]> {
   return handleResponse<Category[]>(res);
 }
 
-export async function createCategory(data: { nom: string; label: string }, token: string): Promise<Category> {
+export async function createCategory(
+  data: { nom: string; label: string },
+  token: string
+): Promise<Category> {
   const res = await fetch(`${BASE_URL}/categories/`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Token ${token}`,
+      Authorization: `Token ${token}`,
     },
     body: JSON.stringify(data),
   });
+
   return handleResponse<Category>(res);
 }
 
-export async function updateCategory(id: number, data: { nom: string; label: string }, token: string): Promise<Category> {
+export async function updateCategory(
+  id: number,
+  data: { nom: string; label: string },
+  token: string
+): Promise<Category> {
   const res = await fetch(`${BASE_URL}/categories/${id}/`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Token ${token}`,
+      Authorization: `Token ${token}`,
     },
     body: JSON.stringify(data),
   });
+
   return handleResponse<Category>(res);
 }
 
@@ -108,11 +135,15 @@ export async function deleteCategory(id: number, token: string): Promise<void> {
   const res = await fetch(`${BASE_URL}/categories/${id}/`, {
     method: 'DELETE',
     headers: {
-      'Authorization': `Token ${token}`,
+      Authorization: `Token ${token}`,
     },
   });
+
   if (!res.ok) {
-    const error = await res.json().catch(() => ({ detail: `Erreur ${res.status}` }));
+    const error = await res.json().catch(() => ({
+      detail: `Erreur ${res.status}`,
+    }));
+
     throw new Error(error.detail || 'Erreur suppression catégorie');
   }
 }
@@ -132,11 +163,13 @@ export async function createComment(data: CreateCommentaireData): Promise<Commen
     },
     body: JSON.stringify(data),
   });
+
   return handleResponse<Commentaire>(res);
 }
 
-export async function deleteComment(articleId: number): Promise<void> {
-  const res = await fetch(`${BASE_URL}/commentaires/?article=${articleId}`, {
+// ✅ CORRIGÉ : suppression par ID commentaire (IMPORTANT)
+export async function deleteComment(commentId: number): Promise<void> {
+  const res = await fetch(`${BASE_URL}/commentaires/${commentId}/`, {
     method: 'DELETE',
   });
 
@@ -149,13 +182,18 @@ export async function deleteComment(articleId: number): Promise<void> {
   }
 }
 
-// ==================== AUTHENTIFICATION ====================
+// ==================== AUTH ====================
 
 export async function loginAdmin(email: string, password: string): Promise<string> {
   const res = await fetch(`${BASE_URL}/api-token-auth/`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username: email, password }),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      username: email,
+      password,
+    }),
   });
 
   const data = await handleResponse<{ token: string }>(res);
